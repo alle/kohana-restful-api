@@ -173,7 +173,7 @@ abstract class Kohana_Controller_Rest extends Controller {
 	 * @param array|object $data
 	 * @param int $code
 	 */
-	protected function rest_output($data = array(), $code = 200)
+	protected function rest_output($data = array(), $code = 200, $encode_options = NULL)
 	{
 		// Handle an empty and valid response.
 		if (empty($data) && 200 == $code)
@@ -202,7 +202,7 @@ abstract class Kohana_Controller_Rest extends Controller {
 		// If the format method exists, call and return the output in that format
 		if (method_exists($this, $format_method))
 		{
-			$output_data = $this->$format_method($data);
+			$output_data = $this->$format_method($data, $encode_options);
 			$this->response->headers('content-type', File::mime_by_ext($this->output_format));
 			$this->response->headers('content-length', (string) strlen($output_data));
 
@@ -225,16 +225,20 @@ abstract class Kohana_Controller_Rest extends Controller {
 	/**
 	 * Format the output data to JSON.
 	 */
-	private function _format_json($data = array())
+	private function _format_json($data = array(), $encode_options = NULL)
 	{
+		$encoded = $data instanceof JSend
+			? $data->render($encode_options)
+			: json_encode($data, $encode_options);
+
 		// Support JSONP requests.
 		if ( ($callback = $this->request->query('callback')) && 200 == $this->response->status())
 		{
-			return $callback .'('. json_encode($data) .')';
+			return $callback .'('. $encoded .')';
 		}
 		else
 		{
-			return json_encode($data);
+			return $encoded;
 		}
 	}
 
