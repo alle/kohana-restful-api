@@ -244,12 +244,64 @@ abstract class Kohana_Controller_Rest extends Controller {
 
 	/**
 	 * Format the output data to XML.
-	 * @TODO Improve this implementation (or maybe not, because XML is dead).
 	 */
 	private function _format_xml($data = array())
 	{
-		$xml = XML::factory(null,'data')->from_array($data);
-		return $xml;
+		if ($data instanceof JSend)
+		{
+			$data = $data->as_array();
+		}
+		else if (is_object($data))
+		{
+			$data = json_decode(json_encode($data), TRUE);
+		}
+
+		$xml = new XMLWriter;
+		$xml->openMemory();
+		$xml->setIndent(TRUE);
+		$xml->startDocument('1.0', 'UTF-8');
+		$xml->startElement('data');
+		self::__from_array($xml, $data);
+		$xml->endElement();
+		$xml->endDocument();
+
+		return $xml->outputMemory();
+	}
+
+	/**
+	 * Recursive helper for writing XML element(s)
+	 *
+	 * @param XMLWriter $xml XMLWriter instance
+	 * @param array|string $data element(s) to write
+	 */
+	private static function __from_array(XMLWriter & $xml, $data)
+	{
+		if (is_array($data))
+		{
+			foreach ($data as $index => $element)
+			{
+				$xml->startElement($index);
+
+				if (is_array($element))
+				{
+					self::__from_array($xml, $element);
+				}
+				else
+				{
+					if (ctype_alnum($element) OR ctype_graph($element)
+						OR strpos($element, ' ') > -1)
+					{
+						$xml->writeCdata($element);
+					}
+					else
+					{
+						$xml->writeRaw($element);
+					}
+				}
+				
+				$xml->endElement();
+			}
+		}
 	}
 
 	/**
