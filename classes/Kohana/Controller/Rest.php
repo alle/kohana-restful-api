@@ -261,6 +261,15 @@ abstract class Kohana_Controller_Rest extends Controller {
 	 */
 	private function _format_csv($data = array())
 	{
+		if ($data instanceof JSend)
+		{
+			$data = $data->as_array();
+		}
+		else if (is_object($data))
+		{
+			$data = json_decode(json_encode($data), TRUE);
+		}
+
 		$contents = '';
 
 		if (!empty($data))
@@ -298,6 +307,15 @@ abstract class Kohana_Controller_Rest extends Controller {
 	 */
 	private function _format_html($data = array())
 	{
+		if ($data instanceof JSend)
+		{
+			$data = $data->as_array();
+		}
+		else if (is_object($data))
+		{
+			$data = json_decode(json_encode($data), TRUE);
+		}
+
 		// Support a fallback View for errors.
 		if (isset($data['error']))
 		{
