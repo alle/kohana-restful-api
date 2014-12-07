@@ -118,7 +118,7 @@ Notice that you will have to load your user's groups as part of your `RestUser`'
 
 Once this is set, you may use the `RestUser` functions `can()` and `is_a()` in your controllers and models to authorize different actions. For example:
 
-	if (!$this->_user->can('create redmine issues))
+	if (!$this->_user->can('create redmine issues'))
 	{
 		throw HTTP_Exception::factory(401, array('error' => 'You cannot create issues'), array(), NULL);
 	}
