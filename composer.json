@@ -1,25 +1,30 @@
 {
-    "name": "alle/kohana-restful-api",
-	"type":  "kohana-module",
-    "description": "A feature-packed Kohana module that adds RESTful API support to your Kohana applications",
-	"homepage": "https://github.com/alle/kohana-restful-api",
-	"license": "MMIT",
-	"keywords": ["kohana", "framework", "module", "restful"],
-    "authors": [
-        {
-            "name": "SupersonicAds",
-			"homepage": "http://www.supersonicads.com/",
-			"role": "original developer"
-        },
-        {
-            "name": "Alessandro Frangioni",
-            "email": "alessandro@gruppoinsieme.it",
-			"role": "developer"
-        }
-    ],
-    "require": {
-		"composer/installers": "~1.0",
-		"kohana/core": ">=3.3",
-		"php": ">=5.3.3"
+  "name":        "alle/kohana-restful-api",
+  "type":        "kohana-module",
+  "description": "A feature-packed Kohana module that adds RESTful API support to your Kohana applications",
+  "homepage":    "https://github.com/alle/kohana-restful-api",
+  "license":     "MMIT",
+  "keywords":    [
+    "kohana",
+    "framework",
+    "module",
+    "restful"
+  ],
+  "authors":     [
+    {
+      "name":     "SupersonicAds",
+      "homepage": "http://www.supersonicads.com/",
+      "role":     "original developer"
+    },
+    {
+      "name":  "Alessandro Frangioni",
+      "email": "alessandro.frangioni@gmail.com",
+      "role":  "developer"
     }
+  ],
+  "require":     {
+    "composer/installers": "~1.0",
+    "kohana/core":         ">=3.3",
+    "php":                 ">=5.3.3"
+  }
 }
