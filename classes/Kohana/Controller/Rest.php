@@ -155,12 +155,16 @@ abstract class Kohana_Controller_Rest extends Controller {
 	}
 
 	/**
-	 * Handling of output data set in action methods with $this->rest_output($data).
+	 * Handling of output data set in action methods with $this->rest_output($data)
 	 *
-	 * @param array|object $data
-	 * @param int $code
+	 * @param array $data         data to encode
+	 * @param int   $code         status code
+	 * @param int   $json_options json_encode options
+	 * @param int   $json_depth   json_encode depth
+	 *
+	 * @throws \Kohana_Exception
 	 */
-	protected function rest_output($data = array(), $code = 200, $encode_options = NULL)
+	protected function rest_output($data = array(), $code = 200, $json_options = 0, $json_depth = 512)
 	{
 		// Handle an empty and valid response.
 		if (empty($data) && 200 == $code)
@@ -189,7 +193,7 @@ abstract class Kohana_Controller_Rest extends Controller {
 		// If the format method exists, call and return the output in that format
 		if (method_exists($this, $format_method))
 		{
-			$output_data = $this->$format_method($data, $encode_options);
+			$output_data = $this->$format_method($data, $json_options, $json_depth);
 			$this->response->headers('content-type', File::mime_by_ext($this->output_format));
 			$this->response->headers('content-length', (string) strlen($output_data));
 
@@ -212,11 +216,19 @@ abstract class Kohana_Controller_Rest extends Controller {
 	/**
 	 * Format the output data to JSON.
 	 */
-	private function _format_json($data = array(), $encode_options = NULL)
+	/**
+	 * Format the output data to JSON
+	 *
+	 * @param array $data    data to encode
+	 * @param int   $options json_encode options
+	 * @param int   $depth   json_encode depth
+	 *
+	 * @return string
+	 * @throws \Kohana_Exception
+	 */
+	private function _format_json($data = array(), $options = 0, $depth = 512)
 	{
-		$encoded = $data instanceof JSend
-			? $data->render($encode_options)
-			: json_encode($data, $encode_options);
+		$encoded = json_encode($data, $options);
 
 		// Support JSONP requests.
 		if ( ($callback = $this->request->query('callback')) && 200 == $this->response->status())
@@ -230,15 +242,15 @@ abstract class Kohana_Controller_Rest extends Controller {
 	}
 
 	/**
-	 * Format the output data to XML.
+	 * Format the output data to XML
+	 *
+	 * @param array $data data to encode
+	 *
+	 * @return string
 	 */
 	private function _format_xml($data = array())
 	{
-		if ($data instanceof JSend)
-		{
-			$data = $data->as_array();
-		}
-		else if (is_object($data))
+		if (is_object($data))
 		{
 			$data = json_decode(json_encode($data), TRUE);
 		}
@@ -258,7 +270,7 @@ abstract class Kohana_Controller_Rest extends Controller {
 	/**
 	 * Recursive helper for writing XML element(s)
 	 *
-	 * @param XMLWriter $xml XMLWriter instance
+	 * @param XMLWriter    $xml  XMLWriter instance
 	 * @param array|string $data element(s) to write
 	 */
 	private static function __from_array(XMLWriter & $xml, $data)
@@ -296,15 +308,15 @@ abstract class Kohana_Controller_Rest extends Controller {
 	 * Requires the data to be a 2-dimensional array.
 	 * 1-dimension arrays are also supported, by converting them to 2-dimensions.
 	 *
+	 * @param array $data data to encode
+	 *
+	 * @return string
+	 *
 	 * @TODO This doesn't really work well with arrays, requires deeper inspection.
 	 */
 	private function _format_csv($data = array())
 	{
-		if ($data instanceof JSend)
-		{
-			$data = $data->as_array();
-		}
-		else if (is_object($data))
+		if (is_object($data))
 		{
 			$data = json_decode(json_encode($data), TRUE);
 		}
@@ -343,14 +355,15 @@ abstract class Kohana_Controller_Rest extends Controller {
 
 	/**
 	 * Call a View to format the data as HTML.
+	 *
+	 * @param array $data data to encode
+	 *
+	 * @return string
+	 * @throws \Kohana_Exception
 	 */
 	private function _format_html($data = array())
 	{
-		if ($data instanceof JSend)
-		{
-			$data = $data->as_array();
-		}
-		else if (is_object($data))
+		if (is_object($data))
 		{
 			$data = json_decode(json_encode($data), TRUE);
 		}
@@ -499,4 +512,4 @@ abstract class Kohana_Controller_Rest extends Controller {
 	 */
 	public function action_error() {}
 
-} // END
+}
