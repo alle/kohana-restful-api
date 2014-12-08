@@ -272,18 +272,30 @@ abstract class Kohana_Controller_Rest extends Controller {
 	 *
 	 * @param XMLWriter    $xml  XMLWriter instance
 	 * @param array|string $data element(s) to write
+	 * @param string       $root root tag for nested elements
 	 */
-	private static function __from_array(XMLWriter & $xml, $data)
+	private static function __from_array(XMLWriter & $xml, $data, $root = '')
 	{
 		if (is_array($data))
 		{
 			foreach ($data as $index => $element)
 			{
-				$xml->startElement($index);
+				if (is_int($index))
+				{
+					$root = $root
+						? Inflector::singular($root)
+						: 'element_'.$index;
+				}
+				else
+				{
+					$root = $index;
+				}
+
+				$xml->startElement($root);
 
 				if (is_array($element))
 				{
-					self::__from_array($xml, $element);
+					self::__from_array($xml, $element, $root);
 				}
 				else
 				{
